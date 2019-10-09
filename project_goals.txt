@@ -1,0 +1,7 @@
+1. Retrieve 6 month new avg from brick link
+
+2. Retrieve number of completed raffles when searching /r/lego_raffles for that product ID and maybe a list of data for timeframe.
+
+3. Any external requests made could also generate a series of links to click to go look at manually
+
+Can use SELENIUM with BEAUTIFULSOUP to get the html so that you can see the prices after the javascript has executed.
