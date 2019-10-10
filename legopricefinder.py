@@ -1,6 +1,27 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from collections import namedtuple
 
+#creates the Lego_Set named tuple from row data
+def createTuples(table):
+	rows = table.find_all('td')
+
+	clean_rows = []
+	for row in rows:
+		clean_rows.append(row.get_text())
+	return Lego_Set(
+		int(clean_rows[1]), 
+		int(clean_rows[3]), 
+		float(clean_rows[5][4:]), 
+		float(clean_rows[7][4:]),
+		float(clean_rows[9][4:]),
+		float(clean_rows[11][4:])
+	)
+
+
+
+
+Lego_Set = namedtuple('Lego_Set', ['times_sold', 'total_qty', 'min_price', 'avg_price', 'qty_avg_price', 'max_price'])
 
 lego_id = str(input("Enter Product ID: "))
 url = 'http://www.bricklink.com/v2/catalog/catalogitem.page?S='+lego_id+'#T=P'
@@ -15,23 +36,12 @@ source = browser.page_source
 
 soup = BeautifulSoup(source, 'lxml')
 
-result = soup.find('table', class_='pcipgSummaryTable')
+table = soup.find('table', class_='pcipgSummaryTable')
 
-rows = result.find_all('td')
 
-clean_rows = [];
-for row in rows:
-	clean_rows.append(row.get_text())
-
-# rows = result.find_all('tr')
-
-# for row in rows:
-# 	row.find_all('td')
-
-print result
-print "\r\n"
-print clean_rows
+print createTuples(table)
 browser.quit()
+
 
 
 
