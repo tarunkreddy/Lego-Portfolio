@@ -7,3 +7,18 @@
 {% else %}
 	<p>Your collection is empty.</p>
 {% endif %}
+
+<form action="{% url 'collection:insert' %}" method="post">
+{% csrf_token %}
+Owner: <input type="text" name="owner" id="owner" required/><br>
+Lego ID: <input type="text" name="lego_id" id="lego_id" required/><br>
+Purchase Price: <input type="number" name="purchase_price" id="purchase_price" step="0.01" min="0" required><br>
+Sold For: <input type="number" name="actual_selling_price" id="actual_selling_price" step="0.01" min="0" value="0" required><br>
+Shipping Cost: <input type="number" name="shipping_cost" id="shipping_cost" step="0.01" min="0" value="0" required><br>
+
+
+
+
+
+<input type="submit" value="Add Set">
+</form>
