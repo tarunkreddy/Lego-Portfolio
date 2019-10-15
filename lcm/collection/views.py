@@ -10,6 +10,7 @@ from .models import CollectionItem
 
 from bs4 import BeautifulSoup
 import requests
+from datetime import date, timedelta
 
 # owner = models.CharField(max_length=20)
 # 	lego_id = models.ForeignKey(LegoSet)
@@ -39,6 +40,21 @@ def insert(request):
 	return HttpResponseRedirect(reverse('collection:index'))
 
 def checkPrice(request, lego_id):
+	try:
+		l = LegoSet.objects.get(pk=lego_id)
+	except (KeyError, LegoSet.DoesNotExist):
+		return HttpResponseRedirect(reverse('collection:index'))
+	if l.price_last_updated <= date.today()-timedelta(days=7):
+		avg_price = retrievePrice(lego_id)
+		l.estimated_selling_price = avg_price
+		l.save()
+	else:
+		avg_price = l.estimated_selling_price
+
+	return HttpResponse("The price for set " + lego_id + " is " + str(avg_price))
+
+
+def retrievePrice(lego_id):
 	url = 'http://www.bricklink.com/catalogPG.asp?S=' + lego_id
 	headers = {'User-Agent': "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
 	page = requests.get(url, headers=headers)
@@ -48,5 +64,6 @@ def checkPrice(request, lego_id):
 	table = soup.findAll('table')[12]
 	rows = table.findAll('td')
 	avg_price = rows[7].get_text()
-	return HttpResponse("The price for set " + lego_id + " is " + avg_price)
+	return float(avg_price[4:])
+
 
