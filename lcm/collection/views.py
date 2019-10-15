@@ -8,6 +8,9 @@ from django.urls import reverse
 from .models import LegoSet
 from .models import CollectionItem
 
+from bs4 import BeautifulSoup
+import requests
+
 # owner = models.CharField(max_length=20)
 # 	lego_id = models.ForeignKey(LegoSet)
 # 	purchase_price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -34,3 +37,16 @@ def insert(request):
 		)
 	toInsert.save()
 	return HttpResponseRedirect(reverse('collection:index'))
+
+def checkPrice(request, lego_id):
+	url = 'http://www.bricklink.com/catalogPG.asp?S=' + lego_id
+	headers = {'User-Agent': "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
+	page = requests.get(url, headers=headers)
+	source = page.text
+	soup = BeautifulSoup(source, 'lxml')
+	# name = soup.find('span', id='item-name-title').get_text()
+	table = soup.findAll('table')[12]
+	rows = table.findAll('td')
+	avg_price = rows[7].get_text()
+	return HttpResponse("The price for set " + lego_id + " is " + avg_price)
+
