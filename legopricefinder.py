@@ -47,7 +47,12 @@ def checkPrice(lego_id=-1):
 	if (lego_id == -1):
 		lego_id = int(input("Enter Product ID: "))
 	url = 'http://www.bricklink.com/v2/catalog/catalogitem.page?S='+str(lego_id)+'#T=P'
-	browser = webdriver.Chrome()
+	
+	chrome_options = webdriver.ChromeOptions()
+	chrome_options.add_argument('--headless')
+	chrome_options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
+
+	browser = webdriver.Chrome(chrome_options=chrome_options)
 	browser.get(url)
 	source = browser.page_source
 
