@@ -23,6 +23,19 @@ class CollectionItem(models.Model):
 	shipping_cost = models.DecimalField(max_digits=5, decimal_places=2)
 	used = models.BooleanField(default=False)
 
+	@property
+	def profit(self):
+		return (self.actual_selling_price - self.purchase_price - self.shipping_cost)
+
+
 	def __str__(self):
-		return self.owner + "'s " + str(self.lego_id) + ': Paid ' + str(self.purchase_price+self.shipping_cost) + ', Sold for ' + str(self.actual_selling_price) 
+		return self.owner + \
+		"'s " + \
+		str(self.lego_id) + \
+		': Paid ' + \
+		str(self.purchase_price+self.shipping_cost) + \
+		', Sold for ' + str(self.actual_selling_price) + \
+		', PROFIT: ' + str(self.profit)
+
+	
 
