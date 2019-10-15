@@ -3,6 +3,7 @@ from selenium import webdriver
 from collections import namedtuple
 import sqlite3
 import sys
+import requests
 
 
 Lego_Set = namedtuple('Lego_Set', ['times_sold', 'total_qty', 'min_price', 'avg_price', 'qty_avg_price', 'max_price'])
@@ -48,21 +49,17 @@ def checkPrice(lego_id=-1):
 		lego_id = int(input("Enter Product ID: "))
 	url = 'http://www.bricklink.com/v2/catalog/catalogitem.page?S='+str(lego_id)+'#T=P'
 	
-	chrome_options = webdriver.ChromeOptions()
-	chrome_options.add_argument('--headless')
-	chrome_options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
-
-	browser = webdriver.Chrome(chrome_options=chrome_options)
-	browser.get(url)
-	source = browser.page_source
-
+	headers = {'User-Agent': "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
+	page = requests.get('http://www.bricklink.com/catalogPG.asp?S=21303-1', headers=headers)
+	source = page.text
 	soup = BeautifulSoup(source, 'lxml')
+	# name = soup.find('span', id='item-name-title').get_text()
+	table = soup.findAll('table')[12]
+	rows = table.findAll('td')
+	avg_price = rows[7].get_text()
+	# print name
 
-	table = soup.find('table', class_='pcipgSummaryTable')
-
-	browser.quit()
-
-	return getSetData(table).avg_price
+	return avg_price
 
 
 def main():
