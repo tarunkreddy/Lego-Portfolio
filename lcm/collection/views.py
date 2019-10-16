@@ -10,8 +10,12 @@ from .models import CollectionItem
 
 from bs4 import BeautifulSoup
 import requests
+import json
 from datetime import date, timedelta
 from decimal import *
+from local_settings import *
+
+
 
 
 # owner = models.CharField(max_length=20)
@@ -31,7 +35,6 @@ def insert(request):
 		l = LegoSet.objects.get(pk=request.POST['lego_id'])
 	except (KeyError, LegoSet.DoesNotExist):
 		l = insertNew(request.POST['lego_id'])
-		# return HttpResponseRedirect(reverse('collection:index'))
 	toInsert = CollectionItem(
 		owner=request.POST['owner'],
 		lego_id=l,
@@ -97,13 +100,23 @@ def retrieveInfo(lego_id):
 	}
 
 def insertNew(lego_id):
-	info = retrieveInfo(lego_id)
+	info = getSet(lego_id)
+	price_info = retrieveInfo(lego_id)
+
 	l = LegoSet(
 		lego_id=lego_id,
 		set_name=info['name'],
-		estimated_selling_price=info['estimated_selling_price']
+		img_url=info['set_img_url'],
+		estimated_selling_price=price_info['estimated_selling_price']
 	)
 	l.save()
 	return l
+
+def getSet(lego_id):
+	url = 'https://rebrickable.com/api/v3/lego/sets/' + lego_id + '/'
+	headers = {'Authorization': 'key ' + REBRICKABLE_API_KEY}
+	response = requests.get(url, headers=headers)
+	return json.loads(response.text)
+
 
 

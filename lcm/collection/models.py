@@ -9,7 +9,9 @@ class LegoSet(models.Model):
 	set_name = models.CharField(default='placeholder_name', max_length=100)
 	estimated_selling_price = models.DecimalField(max_digits=6, decimal_places=2)
 	price_last_updated = models.DateField(auto_now=True)
+	img_url = models.URLField(default="")
 	retired = models.BooleanField(default=True)
+
 	
 
 	def __str__(self):
