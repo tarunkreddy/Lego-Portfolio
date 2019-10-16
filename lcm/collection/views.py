@@ -11,6 +11,8 @@ from .models import CollectionItem
 from bs4 import BeautifulSoup
 import requests
 from datetime import date, timedelta
+from decimal import *
+
 
 # owner = models.CharField(max_length=20)
 # 	lego_id = models.ForeignKey(LegoSet)
@@ -51,7 +53,16 @@ def checkPrice(request, lego_id):
 	else:
 		avg_price = l.estimated_selling_price
 
-	return HttpResponse("The price for set " + lego_id + " is " + str(avg_price))
+	good_buy_estimate = round((avg_price * Decimal(0.90)), 2)
+
+	context = {
+		'lego_id': lego_id, 
+		'name': l.set_name, 
+		'avg_price': avg_price,
+		'good_buy_estimate': good_buy_estimate
+	}
+
+	return render(request, 'collection/buying-guide.html', context)
 
 
 def retrievePrice(lego_id):
