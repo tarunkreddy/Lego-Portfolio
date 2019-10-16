@@ -3,7 +3,7 @@
 	<link rel="stylesheet" href="{% static 'bootstrap-4.3.1-dist/css/bootstrap.css' %}">
 </head>
 {% if collection_list %}
-	<table class="table">
+	<table class="table table-striped">
 		<thead>
 			<tr>
 				<th scope="col">Owner</th>
@@ -17,6 +17,7 @@
 		</thead>
 		<tbody>
 			{% for item in collection_list %}
+			<tr>
 				<td>{{ item.owner }}</td>
 				<td>{{ item.lego_id.lego_id }}</td>
 				<td>{{ item.lego_id.set_name }}</td>
@@ -24,6 +25,7 @@
 				<td>{{ item.actual_selling_price }}</td>
 				<td>{{ item.profit }}</td>
 				<td><a href= {% url 'collection:check' item.lego_id.lego_id %} target="_blank">View Buying Guide</a></td>
+			</tr>
 			{% endfor %}
 		</tbody>
 	</table>

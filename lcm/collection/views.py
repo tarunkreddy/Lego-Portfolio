@@ -30,7 +30,8 @@ def insert(request):
 	try:
 		l = LegoSet.objects.get(pk=request.POST['lego_id'])
 	except (KeyError, LegoSet.DoesNotExist):
-		return HttpResponseRedirect(reverse('collection:index'))
+		l = insertNew(request.POST['lego_id'])
+		# return HttpResponseRedirect(reverse('collection:index'))
 	toInsert = CollectionItem(
 		owner=request.POST['owner'],
 		lego_id=l,
@@ -40,6 +41,7 @@ def insert(request):
 		)
 	toInsert.save()
 	return HttpResponseRedirect(reverse('collection:index'))
+
 
 def checkPrice(request, lego_id):
 	try:
@@ -76,5 +78,32 @@ def retrievePrice(lego_id):
 	rows = table.findAll('td')
 	avg_price = rows[7].get_text()
 	return float(avg_price[4:])
+
+def retrieveInfo(lego_id):
+	url = 'http://www.bricklink.com/catalogPG.asp?S=' + lego_id
+	headers = {'User-Agent': "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
+	page = requests.get(url, headers=headers)
+	source = page.text
+	soup = BeautifulSoup(source, 'lxml')
+	# name = soup.find('span', id='item-name-title').get_text()
+	name = soup.findAll('table')[3].find('b').get_text()
+	table = soup.findAll('table')[12]
+	rows = table.findAll('td')
+	avg_price = rows[7].get_text()
+	return {
+		'name': name,
+		'estimated_selling_price': float(avg_price[4:])
+
+	}
+
+def insertNew(lego_id):
+	info = retrieveInfo(lego_id)
+	l = LegoSet(
+		lego_id=lego_id,
+		set_name=info['name'],
+		estimated_selling_price=info['estimated_selling_price']
+	)
+	l.save()
+	return l
 
 
