@@ -3,15 +3,38 @@
 	<link rel="stylesheet" href="{% static 'bootstrap-4.3.1-dist/css/bootstrap.css' %}">
 </head>
 {% if collection_list %}
-	<ul>
-	{% for item in collection_list %}
-		<li>{{ item }} <a href= {% url 'collection:check' item.lego_id.lego_id %}>View Buying Guide</a></li>
-	{% endfor %}
-	</ul>
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">Owner</th>
+				<th scope="col">Lego ID</th>
+				<th scope="col">Name</th>
+				<th scope="col">Purchase Price</th>
+				<th scope="col">Sold For</th>
+				<th scope="col">Profit</th>
+				<th scope="col">Buying Guide Link</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in collection_list %}
+				<td>{{ item.owner }}</td>
+				<td>{{ item.lego_id.lego_id }}</td>
+				<td>{{ item.lego_id.set_name }}</td>
+				<td>{{ item.purchase_price }}</td>
+				<td>{{ item.actual_selling_price }}</td>
+				<td>{{ item.profit }}</td>
+				<td><a href= {% url 'collection:check' item.lego_id.lego_id %} target="_blank">View Buying Guide</a></td>
+			{% endfor %}
+		</tbody>
+	</table>
 {% else %}
 	<p>Your collection is empty.</p>
 {% endif %}
+<br>
+<br>
+<br>
 
+<h3>Add a Set to your Collection</h3>
 <form action="{% url 'collection:insert' %}" method="post">
 {% csrf_token %}
 Owner: <input type="text" name="owner" id="owner" required/><br><br>
