@@ -1,3 +1,7 @@
+{% load static %}
+<head>
+	<link rel="stylesheet" href="{% static 'bootstrap-4.3.1-dist/css/bootstrap.css' %}">
+</head>
 {% if collection_list %}
 	<ul>
 	{% for item in collection_list %}

@@ -1,16 +1,7 @@
-<!-- {% if collection_list %}
-	<ul>
-	{% for item in collection_list %}
-		<li>{{ item }} <a href= {% url 'collection:check' item.lego_id.lego_id %}>View Buying Guide</a></li>
-	{% endfor %}
-	</ul>
-{% else %}
-	<p>Your collection is empty.</p>
-{% endif %}
-
-
-
- -->
+{% load static %}
+<head>
+	<link rel="stylesheet" href="{% static 'bootstrap-4.3.1-dist/css/bootstrap.css' %}">
+</head>
 
  <h1>{{ lego_id }} {{ name }} Buying Guide</h1>
 
