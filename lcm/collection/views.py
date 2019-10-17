@@ -46,7 +46,7 @@ def insert(request):
 	return HttpResponseRedirect(reverse('collection:index'))
 
 
-def checkPrice(request, lego_id):
+def buyingGuide(request, lego_id):
 	try:
 		l = LegoSet.objects.get(pk=lego_id)
 	except (KeyError, LegoSet.DoesNotExist):
@@ -68,6 +68,20 @@ def checkPrice(request, lego_id):
 	}
 
 	return render(request, 'collection/buying-guide.html', context)
+
+def purchaseHelper(request):
+	lego_sets = request.POST['sets']
+	lego_sets = lego_sets.strip().split(',')
+	sets_info = []
+	sale_total = 0
+	for lego_set in lego_sets:
+		i = getInfo(lego_set)
+		sale_total += i.estimated_selling_price
+		sets_info.append(i)
+
+	context = {'sets_info': sets_info, 'sale_total': sale_total}
+	return render(request, 'collection/purchase-helper.html', context)
+
 
 
 def retrievePrice(lego_id):
@@ -98,6 +112,13 @@ def retrieveInfo(lego_id):
 		'estimated_selling_price': float(avg_price[4:])
 
 	}
+
+def getInfo(lego_id):
+	try:
+		l = LegoSet.objects.get(pk=lego_id)
+	except (KeyError, LegoSet.DoesNotExist):
+		l = insertNew(lego_id)
+	return l
 
 def insertNew(lego_id):
 	info = getSet(lego_id)

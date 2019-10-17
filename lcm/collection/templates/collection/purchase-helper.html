@@ -1,0 +1,32 @@
+{% load static %}
+<head>
+	<link rel="stylesheet" href="{% static 'bootstrap-4.3.1-dist/css/bootstrap.css' %}">
+</head>
+
+<a href= {% url 'collection:index' %}>Home</a><br>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th scope="col">Picture</th>
+			<th scope="col">Lego ID</th>
+			<th scope="col">Name</th>
+			<th scope="col">Estimated Selling Price</th>
+			<th scope="col">Buying Guide Link</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for lego_set in sets_info %}
+		<tr>
+			<td class="align-middle"><img style="display:block;max-width:60px;max-height:60px;width:auto;height:auto;" src={{ lego_set.img_url }}></td>
+			<td class="align-middle">{{ lego_set.lego_id }}</td>
+			<td class="align-middle">{{ lego_set.set_name }}</td>
+			<td class="align-middle">{{ lego_set.estimated_selling_price }}</td>
+			<td class="align-middle"><a href= {% url 'collection:buying-guide' lego_set.lego_id %}>View Buying Guide</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<br><br>
+<center><h4>Total Selling Price Is {{ sale_total }}</h4></center>
+

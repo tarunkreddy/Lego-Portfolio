@@ -26,7 +26,7 @@
 				<td class="align-middle">{{ item.purchase_price }}</td>
 				<td class="align-middle">{{ item.actual_selling_price }}</td>
 				<td class="align-middle">{{ item.profit }}</td>
-				<td class="align-middle"><a href= {% url 'collection:check' item.lego_id.lego_id %} target="_blank">View Buying Guide</a></td>
+				<td class="align-middle"><a href= {% url 'collection:buying-guide' item.lego_id.lego_id %}>View Buying Guide</a></td>
 			</tr>
 			{% endfor %}
 		</tbody>
@@ -37,7 +37,6 @@
 <br>
 <br>
 <br>
-
 <h3>Add a Set to your Collection</h3>
 <form action="{% url 'collection:insert' %}" method="post">
 {% csrf_token %}
@@ -47,9 +46,14 @@ Purchase Price: <input type="number" name="purchase_price" id="purchase_price" s
 Sold For: <input type="number" name="actual_selling_price" id="actual_selling_price" step="0.01" min="0" value="0" required><br><br>
 Shipping Cost: <input type="number" name="shipping_cost" id="shipping_cost" step="0.01" min="0" value="0" required><br><br>
 
-
-
-
-
 <input type="submit" value="Add Set">
+</form>
+
+<h3>Purchase Helper</h3>
+<form action="{% url 'collection:purchase-helper' %}" method="post">
+{% csrf_token %}
+Input full set IDs, separated by commas <br>
+<input type="textarea" name="sets" id="sets" required/>
+
+<input type="submit" value="Check Values">
 </form>
