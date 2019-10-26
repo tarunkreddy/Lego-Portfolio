@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+from datetime import datetime
+
 
 @python_2_unicode_compatible
 class LegoSet(models.Model):
@@ -28,6 +30,7 @@ class CollectionItem(models.Model):
     shipping_cost = models.DecimalField(max_digits=5, decimal_places=2)
     sold = models.BooleanField(default=False)
     used = models.BooleanField(default=False)
+    date_purchased = models.DateField(default=datetime.now)
 
     @property
     def profit(self):
