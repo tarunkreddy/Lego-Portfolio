@@ -17,6 +17,8 @@ from datetime import date, timedelta
 from decimal import *
 from local_settings import *
 
+from requests_oauthlib import OAuth1
+
 
 # owner = models.CharField(max_length=20)
 # 	lego_id = models.ForeignKey(LegoSet)
@@ -36,12 +38,16 @@ def insert(request):
         l = LegoSet.objects.get(pk=request.POST['lego_id'])
     except (KeyError, LegoSet.DoesNotExist):
         l = insertNew(request.POST['lego_id'])
+    sold = False
+    if (request.POST['actual_selling_price'] != 0):
+        sold = True
     toInsert = CollectionItem(
         owner=request.POST['owner'],
         lego_id=l,
         purchase_price=request.POST['purchase_price'],
         actual_selling_price=request.POST['actual_selling_price'],
-        shipping_cost=request.POST['shipping_cost']
+        shipping_cost=request.POST['shipping_cost'],
+        sold=sold
     )
     toInsert.save()
     return HttpResponseRedirect(reverse('collection:index'))
@@ -87,36 +93,22 @@ def purchaseHelper(request):
 
 
 def retrievePrice(lego_id):
-    url = 'http://www.bricklink.com/catalogPG.asp?S=' + lego_id
-    headers = {
-        'User-Agent': "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
-    page = requests.get(url, headers=headers)
-    source = page.text
-    soup = BeautifulSoup(source, 'lxml')
-    # name = soup.find('span', id='item-name-title').get_text()
-    table = soup.findAll('table')[12]
-    rows = table.findAll('td')
-    avg_price = rows[7].get_text()
-    return Decimal(avg_price[4:])
+    url = 'https://api.bricklink.com/api/store/v1/items/SET/' + \
+        lego_id + '/price?guide_type=sold'
+    auth = OAuth1(BRICKLINK_CONSUMER_KEY, BRICKLINK_CONSUMER_SECRET,
+                  BRICKLINK_TOKEN_VALUE, BRICKLINK_TOKEN_SECRET)
 
+    response = requests.get(url, auth=auth)
 
-def retrieveInfo(lego_id):
-    url = 'http://www.bricklink.com/catalogPG.asp?S=' + lego_id
-    headers = {
-        'User-Agent': "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
-    page = requests.get(url, headers=headers)
-    source = page.text
-    soup = BeautifulSoup(source, 'lxml')
-    # name = soup.find('span', id='item-name-title').get_text()
-    name = soup.findAll('table')[3].find('b').get_text()
-    table = soup.findAll('table')[12]
-    rows = table.findAll('td')
-    avg_price = rows[7].get_text()
-    return {
-        'name': name,
-        'estimated_selling_price': float(avg_price[4:])
-
-    }
+    if response:
+        price_guide = response.content.decode('utf-8')
+        pg = json.loads(price_guide)
+        if (pg['meta']['code'] != 200):
+            return
+        else:
+            return Decimal(pg['data']['avg_price'])
+    else:
+        return
 
 
 def getInfo(lego_id):
@@ -129,13 +121,13 @@ def getInfo(lego_id):
 
 def insertNew(lego_id):
     info = getSet(lego_id)
-    price_info = retrieveInfo(lego_id)
+    price_info = retrievePrice(lego_id)
 
     l = LegoSet(
         lego_id=lego_id,
         set_name=info['name'],
         img_url=info['set_img_url'],
-        estimated_selling_price=price_info['estimated_selling_price']
+        estimated_selling_price=price_info
     )
     l.save()
     return l
