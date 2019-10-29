@@ -29,8 +29,9 @@ def index(request):
     collection_list = CollectionItem.objects.all()
     profit = getActualProfit('redwoodclock')
     unsoldProfit = getPortfolioProfit('redwoodclock')
+    raffleProfit = getRaffleProfit('redwoodclock')
     context = {'collection_list': collection_list, 'profit': profit,
-               'unsoldprofit': unsoldProfit}
+               'unsoldprofit': unsoldProfit, 'raffleprofit': raffleProfit}
     return render(request, 'collection/view-collection.html', context)
 
 
@@ -175,3 +176,15 @@ def getPortfolioProfit(owner):
     b = c.aggregate(Sum('purchase_price'))['purchase_price__sum']
     unsold_profit = a - b
     return unsold_profit
+
+# Get Net winnings from raffles;
+
+
+def getRaffleProfit(owner):
+    c = CollectionItem.objects.filter(owner=owner, raffle=True)
+    value = c.filter(sold=True).aggregate(Sum('actual_selling_price'))['actual_selling_price__sum'] + \
+        c.filter(sold=False).aggregate(Sum('lego_id__estimated_selling_price'))[
+        'lego_id__estimated_selling_price__sum']
+    cost = c.aggregate(Sum('purchase_price'))[
+        'purchase_price__sum'] + c.aggregate(Sum('shipping_cost'))['shipping_cost__sum']
+    return value - cost
