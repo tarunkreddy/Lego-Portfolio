@@ -27,10 +27,10 @@ from requests_oauthlib import OAuth1
 # 	shipping_cost = models.DecimalField(max_digits=5, decimal_places=2)
 def index(request):
     collection_list = CollectionItem.objects.all()
-    profit = getActualProfit('redwoodclock')
+    profitInfo = getActualProfit('redwoodclock')
     unsoldProfit = getPortfolioProfit('redwoodclock')
     raffleProfit = getRaffleProfit('redwoodclock')
-    context = {'collection_list': collection_list, 'profit': profit,
+    context = {'collection_list': collection_list, 'profitinfo': profitInfo,
                'unsoldprofit': unsoldProfit, 'raffleprofit': raffleProfit}
     return render(request, 'collection/view-collection.html', context)
 
@@ -156,9 +156,15 @@ def getSet(lego_id):
 def getActualProfit(owner):
     c = CollectionItem.objects.filter(owner=owner).exclude(sold=False)
     profit = 0
+    normalProfit = 0
+    raffleProfit = 0
     for item in c:
         profit += item.profit
-    return profit
+        if item.raffle:
+            raffleProfit += item.profit
+        else:
+            normalProfit += item.profit
+    return {'profit': profit, 'raffleprofit': raffleProfit, 'normalprofit': normalProfit}
 
 
 # Returns Value from unsold sets;
