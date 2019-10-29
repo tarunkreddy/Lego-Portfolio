@@ -30,6 +30,7 @@ class CollectionItem(models.Model):
     shipping_cost = models.DecimalField(max_digits=5, decimal_places=2)
     sold = models.BooleanField(default=False)
     used = models.BooleanField(default=False)
+    raffle = models.BooleanField(default=False)
     date_purchased = models.DateField(default=datetime.now)
 
     @property

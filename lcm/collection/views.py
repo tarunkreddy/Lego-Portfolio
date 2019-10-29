@@ -28,7 +28,9 @@ from requests_oauthlib import OAuth1
 def index(request):
     collection_list = CollectionItem.objects.all()
     profit = getActualProfit('redwoodclock')
-    context = {'collection_list': collection_list, 'profit': profit}
+    unsoldProfit = getPortfolioProfit('redwoodclock')
+    context = {'collection_list': collection_list, 'profit': profit,
+               'unsoldprofit': unsoldProfit}
     return render(request, 'collection/view-collection.html', context)
 
 
@@ -39,7 +41,7 @@ def insert(request):
     except (KeyError, LegoSet.DoesNotExist):
         l = insertNew(request.POST['lego_id'])
     sold = False
-    if (request.POST['actual_selling_price'] != 0):
+    if (float(request.POST['actual_selling_price']) != 0.0):
         sold = True
     toInsert = CollectionItem(
         owner=request.POST['owner'],
@@ -134,16 +136,42 @@ def insertNew(lego_id):
 
 
 def getSet(lego_id):
-    url = 'https://rebrickable.com/api/v3/lego/sets/' + lego_id + '/'
-    headers = {'Authorization': 'key ' + REBRICKABLE_API_KEY}
-    response = requests.get(url, headers=headers)
-    return json.loads(response.text)
+    url = 'https://api.bricklink.com/api/store/v1/items/SET/' + lego_id
+    auth = OAuth1(BRICKLINK_CONSUMER_KEY, BRICKLINK_CONSUMER_SECRET,
+                  BRICKLINK_TOKEN_VALUE, BRICKLINK_TOKEN_SECRET)
+    response = requests.get(url, auth=auth)
+    if response:
+        set_info = response.content.decode('utf-8')
+        info = json.loads(set_info)
+        if (info['meta']['code'] != 200):
+            return
+        else:
+            return {'name': info['data']['name'], 'set_img_url': info['data']['thumbnail_url']}
+    else:
+        return
 
 
-# Only calculates profit from sold sets; More useful
+# Only calculates profit from sold sets;
 def getActualProfit(owner):
     c = CollectionItem.objects.filter(owner=owner).exclude(sold=False)
     profit = 0
     for item in c:
         profit += item.profit
     return profit
+
+
+# Returns Value from unsold sets;
+def getPortfolioValue(owner):
+    c = CollectionItem.objects.filter(owner=owner).exclude(sold=True)
+    unsold_value = c.aggregate(Sum('lego_id__estimated_selling_price'))
+    return unsold_value
+
+
+# Get potential Profit from unsold sets;
+def getPortfolioProfit(owner):
+    c = CollectionItem.objects.filter(owner=owner).exclude(sold=True)
+    a = c.aggregate(Sum('lego_id__estimated_selling_price'))[
+        'lego_id__estimated_selling_price__sum']
+    b = c.aggregate(Sum('purchase_price'))['purchase_price__sum']
+    unsold_profit = a - b
+    return unsold_profit
