@@ -177,10 +177,10 @@ def getPortfolioValue(owner):
 # Get potential Profit from unsold sets;
 def getPortfolioProfit(owner):
     c = CollectionItem.objects.filter(owner=owner).exclude(sold=True)
-    a = c.aggregate(Sum('lego_id__estimated_selling_price'))[
+    value = c.aggregate(Sum('lego_id__estimated_selling_price'))[
         'lego_id__estimated_selling_price__sum']
-    b = c.aggregate(Sum('purchase_price'))['purchase_price__sum']
-    unsold_profit = a - b
+    cost = c.aggregate(Sum('purchase_price'))['purchase_price__sum']
+    unsold_profit = value - cost
     return unsold_profit
 
 # Get Net winnings from raffles;
