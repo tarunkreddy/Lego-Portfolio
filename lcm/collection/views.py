@@ -147,7 +147,8 @@ def getSet(lego_id):
         if (info['meta']['code'] != 200):
             return
         else:
-            return {'name': info['data']['name'], 'set_img_url': info['data']['thumbnail_url']}
+            name = info['data']['name'].replace("&#39;", "'")
+            return {'name': name, 'set_img_url': info['data']['thumbnail_url']}
     else:
         return
 
