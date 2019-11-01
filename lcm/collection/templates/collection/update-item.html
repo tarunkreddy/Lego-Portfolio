@@ -1,0 +1,13 @@
+{% load static %}
+<head>
+	<link rel="stylesheet" href="{% static 'bootstrap-4.3.1-dist/css/bootstrap.css' %}">
+</head>
+<h1>Updating {{ item.lego_id.set_name }}
+<form action="{% url 'collection:update' item.id %}" method="post">
+{% csrf_token %}
+	Purchase Price: <input type="number" name="purchase_price" id="purchase_price" step="0.01" min="0" value={{ item.purchase_price }} required><br><br>
+	Sold For: <input type="number" name="actual_selling_price" id="actual_selling_price" step="0.01" min="0" value={{ item.actual_selling_price }} required><br><br>
+	Shipping Cost: <input type="number" name="shipping_cost" id="shipping_cost" step="0.01" min="0" value={{ item.shipping_cost }} required><br><br>
+	Notes: <input type="textarea" name="notes" id="notes" value={{ item.notes }}><br><br> 
+	<input type="submit" value="Update">
+</form>

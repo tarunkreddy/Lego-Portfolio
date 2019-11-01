@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Sum
@@ -152,6 +152,23 @@ def getSet(lego_id):
             return {'name': name, 'set_img_url': info['data']['thumbnail_url']}
     else:
         return
+
+
+def updateItem(request, item_id):
+    item = get_object_or_404(CollectionItem, id=item_id)
+    return render(request, 'collection/update-item.html', {'item': item})
+
+
+def update(request, item_id):
+    item = get_object_or_404(CollectionItem, id=item_id)
+    item.purchase_price = request.POST['purchase_price']
+    item.actual_selling_price = request.POST['actual_selling_price']
+    if (item.actual_selling_price != 0):
+        item.sold = True
+    item.shipping_cost = request.POST['shipping_cost']
+    item.notes = request.POST['notes']
+    item.save()
+    return HttpResponseRedirect(reverse('collection:index'))
 
 
 # Only calculates profit from sold sets;

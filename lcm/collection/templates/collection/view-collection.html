@@ -31,7 +31,7 @@
 				<td class="align-middle">{{ item.purchase_price }}</td>
 				<td class="align-middle">{% if item.sold %} Sold for: {{ item.actual_selling_price }} {% else %} Value: {{ item.lego_id.estimated_selling_price }} {% endif %}</td>
 				<td class="align-middle">{{ item.profit }}</td>
-				<td class="align-middle"><a href= {% url 'collection:buying-guide' item.lego_id.lego_id %}>View Buying Guide</a></td>
+				<td class="align-middle"><a href= {% url 'collection:update-item' item.id %}>Update</a></td>
 			</tr>
 			{% endfor %}
 		</tbody>
