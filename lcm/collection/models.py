@@ -32,6 +32,7 @@ class CollectionItem(models.Model):
     used = models.BooleanField(default=False)
     raffle = models.BooleanField(default=False)
     date_purchased = models.DateField(default=datetime.now)
+    notes = models.TextField(default="")
 
     @property
     def profit(self):
