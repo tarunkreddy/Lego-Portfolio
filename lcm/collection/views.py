@@ -26,7 +26,7 @@ from requests_oauthlib import OAuth1
 # 	actual_selling_price = models.DecimalField(max_digits=6, decimal_places=2)
 # 	shipping_cost = models.DecimalField(max_digits=5, decimal_places=2)
 def index(request):
-    collection_list = CollectionItem.objects.all()
+    collection_list = CollectionItem.objects.all().order_by('-raffle')
     profitInfo = getActualProfit('redwoodclock')
     unsoldProfit = getPortfolioProfit('redwoodclock')
     raffleProfit = getRaffleProfit('redwoodclock')
