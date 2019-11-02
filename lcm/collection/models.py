@@ -32,7 +32,7 @@ class CollectionItem(models.Model):
     used = models.BooleanField(default=False)
     raffle = models.BooleanField(default=False)
     date_purchased = models.DateField(default=datetime.now)
-    notes = models.TextField(default="")
+    notes = models.TextField(default="", blank=True)
 
     @property
     def profit(self):
@@ -46,3 +46,11 @@ class CollectionItem(models.Model):
             str(self.purchase_price+self.shipping_cost) + \
             ', Sold for ' + str(self.actual_selling_price) + \
             ', PROFIT: ' + str(self.profit)
+
+
+@python_2_unicode_compatible
+class Raffle(models.Model):
+    raffle_amount = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.raffle_amount)

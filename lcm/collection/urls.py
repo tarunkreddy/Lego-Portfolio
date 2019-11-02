@@ -11,4 +11,6 @@ urlpatterns = [
     url(r'^update/(?P<item_id>[0-9]+)/$', views.update, name='update'),
     url(r'^update-item/(?P<item_id>[0-9]+)/$',
         views.updateItem, name='update-item'),
+    url(r'^add-raffle/$', views.addRaffle, name='raffle'),
+    url(r'^raffle/$', views.raffleForm, name='raffle-form'),
 ]

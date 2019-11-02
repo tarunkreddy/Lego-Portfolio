@@ -8,7 +8,7 @@ from django.db.models import Sum
 
 
 from .models import LegoSet
-from .models import CollectionItem
+from .models import CollectionItem, Raffle
 
 from bs4 import BeautifulSoup
 import requests
@@ -165,7 +165,7 @@ def update(request, item_id):
     item = get_object_or_404(CollectionItem, id=item_id)
     item.purchase_price = request.POST['purchase_price']
     item.actual_selling_price = request.POST['actual_selling_price']
-    if (item.actual_selling_price != 0):
+    if (float(request.POST['actual_selling_price']) != 0.0):
         item.sold = True
     item.shipping_cost = request.POST['shipping_cost']
     item.notes = request.POST['notes']
@@ -173,7 +173,20 @@ def update(request, item_id):
     return HttpResponseRedirect(reverse('collection:index'))
 
 
+def raffleForm(request):
+    return render(request, 'collection/add-raffle-item.html')
+
+
+def addRaffle(request):
+    raffle_amount = request.POST['raffle_amount']
+    r = Raffle.objects.first()
+    r.raffle_amount += int(raffle_amount)
+    r.save()
+    return HttpResponseRedirect(reverse('collection:index'))
+
 # Only calculates profit from sold sets;
+
+
 def getActualProfit(owner):
     c = CollectionItem.objects.filter(owner=owner).exclude(sold=False)
     profit = 0
@@ -213,6 +226,7 @@ def getRaffleProfit(owner):
         'lego_id__estimated_selling_price__sum']
     cost = c.aggregate(Sum('purchase_price'))[
         'purchase_price__sum'] + c.aggregate(Sum('shipping_cost'))['shipping_cost__sum']
+    cost += getRaffleSpending()
     return value - cost
 
 # Get value of unsold sets
@@ -223,3 +237,8 @@ def getAssetValue(owner):
     value = c.aggregate(Sum('lego_id__estimated_selling_price'))[
         'lego_id__estimated_selling_price__sum']
     return value
+
+
+def getRaffleSpending():
+    r = Raffle.objects.first()
+    return r.raffle_amount

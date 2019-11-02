@@ -1,0 +1,9 @@
+{% load static %}
+<head>
+	<link rel="stylesheet" href="{% static 'bootstrap-4.3.1-dist/css/bootstrap.css' %}">
+</head>
+<form action="{% url 'collection:raffle' %}" method="post">
+{% csrf_token %}
+	Purchase Price: <input type="number" name="raffle_amount" id="raffle_amount" step="1" min="0" required><br><br>
+	<input type="submit" value="Add Raffle">
+</form>
