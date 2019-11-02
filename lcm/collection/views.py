@@ -45,13 +45,15 @@ def insert(request):
     sold = False
     if (float(request.POST['actual_selling_price']) != 0.0):
         sold = True
+    raffle = request.POST.get('raffle', 'off') == 'on'
     toInsert = CollectionItem(
         owner=request.POST['owner'],
         lego_id=l,
         purchase_price=request.POST['purchase_price'],
         actual_selling_price=request.POST['actual_selling_price'],
         shipping_cost=request.POST['shipping_cost'],
-        sold=sold
+        sold=sold,
+        raffle=raffle
     )
     toInsert.save()
     return HttpResponseRedirect(reverse('collection:index'))
