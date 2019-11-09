@@ -242,3 +242,15 @@ def getAssetValue(owner):
 def getRaffleSpending():
     r = Raffle.objects.first()
     return r.raffle_amount
+
+
+def updateSetPrices(owner):
+    c = CollectionItem.objects.filter(
+        owner=owner, sold=False).values('lego_id').distinct()
+    for item in c:
+        item.estimated_selling_price = retrievePrice(item.lego_id)
+        item.save()
+    return True
+
+
+)
