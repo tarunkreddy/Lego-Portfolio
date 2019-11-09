@@ -251,6 +251,3 @@ def updateSetPrices(owner):
         item.estimated_selling_price = retrievePrice(item.lego_id)
         item.save()
     return True
-
-
-)
